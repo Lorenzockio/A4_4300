@@ -5,9 +5,9 @@ const sg      = await seagulls.init(),
       compute = await seagulls.import( './compute.wgsl' ),
       render  = seagulls.constants.vertex + frag,
       size    = (window.innerWidth * window.innerHeight),
-      state   = new Float32Array( size )
+      state   = new Float32Array( size * 2)
 
-for( let i = 0; i < size; i++ ) {
+for( let i = 0; i < size * 2; i++ ) {
   state[ i ] = Math.round( Math.random() )
 }
 
@@ -27,7 +27,7 @@ const computePass = sg.compute({
   shader: compute,
   data: [ res, sg.pingpong( statebuffer1, statebuffer2 ) ],
   dispatchCount:  [Math.round(seagulls.width / 8), Math.round(seagulls.height/8), 1],
-  times: 10
+  times: 1
 })
 
 sg.run( computePass, renderPass )
