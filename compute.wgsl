@@ -4,7 +4,7 @@
 
 fn index( x:i32, y:i32 ) -> u32 {
   let _res = vec2i(res);
-  return u32( (y % _res.y) * _res.x + ( x % _res.x ) );
+  return u32( ((y % _res.y) * _res.x + ( x % _res.x )) * 2 );
 }
 
 @compute
@@ -13,20 +13,18 @@ fn cs( @builtin(global_invocation_id) _cell:vec3u ) {
   let cell = vec3i(_cell);
 
   let i = index(cell.x, cell.y);
-  let activeNeighbors = statein[ index(cell.x + 1, cell.y + 1) ] +
-                        statein[ index(cell.x + 1, cell.y)     ] +
-                        statein[ index(cell.x + 1, cell.y - 1) ] +
-                        statein[ index(cell.x, cell.y - 1)     ] +
-                        statein[ index(cell.x - 1, cell.y - 1) ] +
-                        statein[ index(cell.x - 1, cell.y)     ] +
-                        statein[ index(cell.x - 1, cell.y + 1) ] +
-                        statein[ index(cell.x, cell.y + 1)     ];
+  let A = statein[i];
+  let B = statein[i + 1];
 
-  if( activeNeighbors == 2.0 ) {
-    stateout[i] = statein[i];
-  }else if( activeNeighbors == 3.) {
-    stateout[i] = 1.;
-  }else{
-    stateout[i] = 0.;
-  }
+  outA = A + 
+    (dA * laplaceA() * A) - 
+    (A * B * B) +
+    (feed * (1-A));
+
+  outA = B +
+    (dB * laplaceB() * B) + 
+    (A * B * B) -
+    (k + feed) * B;
+
+  stateout[i] = statein[i];
 }
